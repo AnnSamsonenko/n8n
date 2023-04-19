@@ -98,6 +98,10 @@ export default defineComponent({
 			type: String,
 			default: '',
 		},
+		noDefaultTab: {
+			type: Boolean,
+			default: true,
+		},
 	},
 	mounted() {
 		if (this.mode === 'router') {
@@ -111,7 +115,7 @@ export default defineComponent({
 			});
 			this.activeTab = found ? found.id : '';
 		} else {
-			this.activeTab = this.items.length > 0 ? this.items[0].id : '';
+			this.activeTab = this.items.length > 0 && !this.noDefaultTab ? this.items[0].id : '';
 		}
 
 		this.$emit('input', this.activeTab);

@@ -2,7 +2,7 @@ export type IMenuItem = {
 	id: string;
 	label: string;
 	icon?: string;
-	customIconSize?: 'medium' | 'small';
+	customIconSize?: 'large' | 'medium' | 'small';
 	available?: boolean;
 	position?: 'top' | 'bottom';
 	type?: 'default' | 'link';
@@ -13,6 +13,7 @@ export type IMenuItem = {
 	// For more specific matching, we can use paths
 	activateOnRoutePaths?: string[];
 	children?: IMenuItem[];
+	className?: string;
 };
 
 export type ILinkMenuItemProperties = {

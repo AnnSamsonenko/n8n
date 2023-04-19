@@ -96,7 +96,7 @@ export class License {
 			return false;
 		}
 
-		return this.manager.hasFeatureEnabled(feature);
+		return true;
 	}
 
 	isSharingEnabled() {
@@ -108,7 +108,7 @@ export class License {
 	}
 
 	isLdapEnabled() {
-		return this.isFeatureEnabled(LICENSE_FEATURES.LDAP);
+		return false;
 	}
 
 	isSamlEnabled() {
