@@ -21,22 +21,67 @@
 				/>
 				<span :class="$style.label">{{ item.label }}</span>
 			</template>
-			<el-menu-item
-				v-for="child in availableChildren"
-				:key="child.id"
-				:id="child.id"
-				:class="{
-					[$style.menuItem]: true,
-					[$style.disableActiveStyle]: !isItemActive(child),
-					[$style.active]: isItemActive(child),
-				}"
-				data-test-id="menu-item"
-				:index="child.id"
-				@click="onItemClick(child, $event)"
-			>
-				<n8n-icon v-if="child.icon" :class="$style.icon" :icon="child.icon" />
-				<span :class="$style.label">{{ child.label }}</span>
-			</el-menu-item>
+			<template v-for="child in availableChildren">
+				<el-menu-item
+					v-if="(child.children && child.children.length < 1) || !child.children"
+					:id="child.id"
+					:key="child.id"
+					:class="{
+						[$style.menuItem]: true,
+						[$style.disableActiveStyle]: !isItemActive(child),
+						[$style.active]: isItemActive(child),
+					}"
+					data-test-id="menu-item"
+					:index="child.id"
+					@click="onItemClick(child, $event)"
+				>
+					<n8n-icon v-if="child.icon" :class="$style.icon" :icon="child.icon" />
+					<span :class="$style.label">{{ child.label }}</span>
+				</el-menu-item>
+				<template v-if="child.children && child.children.length > 0">
+					<el-submenu
+						:id="child.id"
+						:class="{
+							[$style.submenu]: true,
+							[$style.compact]: compact,
+							[$style.active]: mode === 'router' && isItemActive(child),
+						}"
+						:index="child.id"
+						popper-append-to-body
+						:popper-class="`${$style.submenuPopper} ${popperClass}`"
+					>
+						<template #title>
+							<n8n-icon
+								v-if="child.icon"
+								:class="{ [$style.icon]: true, [child.className]: !!child.className }"
+								:icon="child.icon"
+								:size="child.customIconSize || 'large'"
+							/>
+							<span :class="$style.label">{{ child.label }}</span>
+						</template>
+						<el-menu-item
+							v-for="childItem in child.children"
+							:id="childItem.id"
+							:key="childItem.id"
+							:class="{
+								[$style.menuItem]: true,
+								[$style.disableActiveStyle]: !isItemActive(childItem),
+								[$style.active]: isItemActive(childItem),
+							}"
+							data-test-id="menu-item"
+							:index="childItem.id"
+							@click="onItemClick(childItem, $event)"
+						>
+							<n8n-icon
+								v-if="childItem.icon"
+								:class="{ [$style.icon]: true, [childItem.className]: !!childItem.className }"
+								:icon="childItem.icon"
+							/>
+							<span :class="$style.label">{{ childItem.label }}</span>
+						</el-menu-item>
+					</el-submenu>
+				</template>
+			</template>
 		</el-submenu>
 		<n8n-tooltip
 			v-else
@@ -60,7 +105,7 @@
 			>
 				<n8n-icon
 					v-if="item.icon"
-					:class="$style.icon"
+					:class="{ [$style.icon]: true, [item.className]: !!item.className }"
 					:icon="item.icon"
 					:size="item.customIconSize || 'large'"
 				/>

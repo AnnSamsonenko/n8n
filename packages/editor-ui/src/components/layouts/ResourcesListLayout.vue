@@ -25,6 +25,8 @@
 					:all-resources-label="$locale.baseText(`${resourceKey}.menu.all`)"
 				/>
 			</enterprise-edition>
+
+			<layout-folders @click="folderClickHandler" v-if="$route.path === '/workflows'" />
 		</template>
 
 		<div v-if="loading">
@@ -168,6 +170,7 @@ import mixins from 'vue-typed-mixins';
 
 import PageViewLayout from '@/components/layouts/PageViewLayout.vue';
 import PageViewLayoutList from '@/components/layouts/PageViewLayoutList.vue';
+import LayoutFolders from '@/components/LayoutFolders.vue';
 import { EnterpriseEditionFeature } from '@/constants';
 import TemplateCard from '@/components/TemplateCard.vue';
 import Vue, { PropType } from 'vue';
@@ -207,6 +210,7 @@ export default mixins(showMessage, debounceHelper).extend({
 		PageViewLayoutList,
 		ResourceOwnershipSelect,
 		ResourceFiltersDropdown,
+		LayoutFolders,
 	},
 	props: {
 		resourceKey: {
@@ -227,7 +231,11 @@ export default mixins(showMessage, debounceHelper).extend({
 		},
 		filters: {
 			type: Object,
-			default: (): IFilters => ({ search: '', ownedBy: '', sharedWith: '' }),
+			default: (): IFilters => ({
+				search: '',
+				ownedBy: '',
+				sharedWith: '',
+			}),
 		},
 		additionalFiltersHandler: {
 			type: Function,
@@ -249,6 +257,7 @@ export default mixins(showMessage, debounceHelper).extend({
 			hasFilters: false,
 			resettingFilters: false,
 			EnterpriseEditionFeature,
+			unassignedSelected: false,
 		};
 	},
 	computed: {
@@ -295,6 +304,10 @@ export default mixins(showMessage, debounceHelper).extend({
 					matches = matches && resource.name.toLowerCase().includes(searchString);
 				}
 
+				if (this.unassignedSelected) {
+					matches = matches && resource.tags && resource.tags.length === 0;
+				}
+
 				if (this.additionalFiltersHandler) {
 					matches = this.additionalFiltersHandler(resource, this.filters, matches);
 				}
@@ -333,11 +346,19 @@ export default mixins(showMessage, debounceHelper).extend({
 			this.loading = false;
 			this.$nextTick(this.focusSearchInput);
 		},
+		folderClickHandler(tagId) {
+			if (!tagId) {
+				this.resetFilters();
+				this.unassignedSelected = true;
+			} else if (!this.filters.tags.includes(tagId)) {
+				this.unassignedSelected = false;
+				this.filters.tags = [tagId];
+			}
+		},
 		resetFilters() {
 			Object.keys(this.filters).forEach((key) => {
 				this.filters[key] = Array.isArray(this.filters[key]) ? [] : '';
 			});
-
 			this.resettingFilters = true;
 			this.sendFiltersTelemetry('reset');
 		},
@@ -404,6 +425,7 @@ export default mixins(showMessage, debounceHelper).extend({
 	},
 	watch: {
 		isOwnerSubview() {
+			this.resetFilters();
 			this.sendSubviewTelemetry();
 		},
 		'filters.ownedBy'(value) {

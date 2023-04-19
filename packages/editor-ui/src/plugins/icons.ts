@@ -58,6 +58,7 @@ import {
 	faFingerprint,
 	faFlask,
 	faFolderOpen,
+	faFolder,
 	faFont,
 	faGlobeAmericas,
 	faGift,
@@ -193,6 +194,7 @@ addIcon(faFilter);
 addIcon(faFingerprint);
 addIcon(faFlask);
 addIcon(faFolderOpen);
+addIcon(faFolder);
 addIcon(faFont);
 addIcon(faGift);
 addIcon(faGlobe);
